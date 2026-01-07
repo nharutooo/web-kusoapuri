@@ -198,7 +198,7 @@
             // 早押しボタンが押されたとき
             const handleHayaoshiClick = () => {
                 if (state === 'waiting') {
-                    resetGame('何してるの？');
+                    resetGame(isTutorial ? 'ちょっと早いよ！' : '何してるの？');
                     return;
                 }
 
