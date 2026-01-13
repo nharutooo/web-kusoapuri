@@ -115,7 +115,7 @@
             };
 
             // ゲームを初期状態へ戻す
-            const resetGame = (message = null) => {
+            const resetGame = (message = null, { instant = false } = {}) => {
                 clearTimeout(cueTimer);
                 clearTimeout(moveStopTimer);
                 cueTimer = null;
@@ -130,7 +130,15 @@
                     const btnRect = hayaoshiButton.getBoundingClientRect();
                     const x = Math.max((areaRect.width - btnRect.width) / 2, 0);
                     const y = Math.max((areaRect.height - btnRect.height) / 2, 0);
-                    hayaoshiButton.style.transform = `translate(${x}px, ${y}px)`;
+                    if (instant) {
+                        const prevTransition = hayaoshiButton.style.transition;
+                        hayaoshiButton.style.transition = 'none';
+                        hayaoshiButton.style.transform = `translate(${x}px, ${y}px)`;
+                        hayaoshiButton.getBoundingClientRect(); // force reflow so transition toggle takes effect
+                        hayaoshiButton.style.transition = prevTransition || '';
+                    } else {
+                        hayaoshiButton.style.transform = `translate(${x}px, ${y}px)`;
+                    }
                 }
                 setState('idle');
                 startButton.textContent = startLabel();
@@ -236,7 +244,7 @@
 
             // 初期位置セット（ロード後に中央へ）
             const centerIfNeeded = () => {
-                resetGame(null);
+                resetGame(null, { instant: true });
                 hayaoshiButton.classList.remove('opacity-0');
             };
             if (hayaoshiButton.complete) {
