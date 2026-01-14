@@ -7,76 +7,87 @@
 
     <div class="py-6 bg-gray-100 min-h-screen flex flex-col items-center justify-start select-none overflow-hidden relative">
         
-        {{-- ■ メッセージ表示エリア（嘘つき） ■ --}}
-        <div id="message-area" class="w-full text-center h-24 flex items-end justify-center mb-2">
+        {{-- ■ メッセージ表示エリア ■ --}}
+        <div id="message-area" class="w-full text-center h-24 flex items-end justify-center mb-2 z-10">
             <h1 id="main-text" class="text-6xl font-black text-gray-800 drop-shadow-md tracking-widest">
                 START
             </h1>
         </div>
 
         {{-- ■ ゲーム画面エリア ■ --}}
-        <div class="relative w-[98%] h-[500px] bg-white border-4 border-black overflow-hidden shadow-2xl rounded-sm">
+        <div class="relative w-[98%] h-[650px] bg-white border-4 border-black overflow-hidden shadow-2xl rounded-sm">
             
-            {{-- 背景 --}}
-            <div class="absolute inset-0 bg-blue-100 opacity-50 pointer-events-none"></div>
-            <div class="absolute bottom-0 w-full h-16 bg-green-700"></div> 
+            {{-- 背景画像 --}}
+            <img id="bg-img" src="" class="absolute inset-0 w-full h-full object-cover opacity-70 z-0 pointer-events-none">
+            <div class="absolute bottom-0 w-full h-16 bg-green-700 z-0 opacity-80"></div> 
+
+            {{-- 制限時間バー --}}
+            <div id="timer-bar" class="absolute top-0 left-0 h-4 bg-red-600 z-50 w-full hidden"></div>
 
             {{-- ■ プレイヤー（左側） ■ --}}
-            <div id="player" class="absolute bottom-16 left-[20%] w-24 h-40 bg-blue-500 border-2 border-black flex items-center justify-center">
-                <span class="text-white font-bold">自分</span>
+            <div id="player" class="absolute bottom-16 left-[10%] w-64 h-80 border-0 flex items-end justify-center z-10">
+                <img id="player-img" src="" class="w-full h-full object-contain drop-shadow-2xl">
+                <span class="absolute -bottom-8 text-black font-bold bg-white px-2 rounded border border-black">自分</span>
                 
-                {{-- 自分の出した手を表示するエリア --}}
-                <div id="player-hand-display" class="absolute -top-24 left-0 w-full text-center text-6xl drop-shadow-md transition-transform duration-100"></div>
+                {{-- 自分の手 --}}
+                <div id="player-hand-display" class="absolute -top-40 left-0 w-full text-center text-8xl drop-shadow-md transition-transform duration-100 z-30"></div>
 
-                <div id="player-hammer" class="hidden absolute -right-20 top-0 w-24 h-12 bg-red-600 border-2 border-black transform rotate-12 origin-left z-20">
-                    <span class="text-xs text-white p-1">ピコハン</span>
-                </div>
-                <div id="player-helmet" class="hidden absolute -top-8 left-0 w-24 h-10 bg-yellow-400 border-2 border-black rounded-t-full z-20"></div>
+                {{-- ハンマー（通常サイズを少し大きく: w-48 h-48） --}}
+                <img id="player-hammer-img" src="" class="hidden absolute -right-32 top-0 w-48 h-48 object-contain transform rotate-12 origin-left z-20 drop-shadow-xl">
+
+                {{-- ★★★ ヘルメット（画像化） ★★★ --}}
+                <img id="player-helmet-img" src="" class="hidden absolute -top-24 left-4 w-56 h-56 object-contain z-20 drop-shadow-xl">
             </div>
 
             {{-- ■ CPU（右側） ■ --}}
-            <div id="cpu" class="absolute bottom-16 right-[20%] w-24 h-40 bg-red-500 border-2 border-black flex items-center justify-center transition-none">
-                <span class="text-white font-bold">相手</span>
+            <div id="cpu" class="absolute bottom-16 right-[10%] w-64 h-80 border-0 flex items-end justify-center transition-none z-10">
+                <img id="cpu-img" src="" class="w-full h-full object-contain drop-shadow-2xl">
+                <span class="absolute -bottom-8 text-black font-bold bg-white px-2 rounded border border-black">相手</span>
                 
-                {{-- 相手の出した手を表示するエリア --}}
-                <div id="cpu-hand-display" class="absolute -top-24 left-0 w-full text-center text-6xl drop-shadow-md transition-transform duration-100"></div>
+                {{-- 相手の手 --}}
+                <div id="cpu-hand-display" class="absolute -top-40 left-0 w-full text-center text-8xl drop-shadow-md transition-transform duration-100 z-30"></div>
 
-                <div id="cpu-hammer" class="hidden absolute -left-20 top-0 w-24 h-12 bg-red-600 border-2 border-black transform -rotate-12 origin-right z-20"></div>
-                <div id="cpu-helmet" class="hidden absolute -top-8 left-0 w-24 h-10 bg-yellow-400 border-2 border-black rounded-t-full z-20"></div>
+                {{-- ハンマー --}}
+                <img id="cpu-hammer-img" src="" class="hidden absolute -left-32 top-0 w-48 h-48 object-contain transform -rotate-12 origin-right z-20 drop-shadow-xl">
+
+                {{-- ★★★ ヘルメット（画像化） ★★★ --}}
+                <img id="cpu-helmet-img" src="" class="hidden absolute -top-24 left-4 w-56 h-56 object-contain z-20 drop-shadow-xl">
             </div>
         </div>
 
         {{-- ■ 操作パネルエリア ■ --}}
-        <div class="mt-6 w-full max-w-4xl">
+        <div class="mt-6 w-full max-w-4xl min-h-[120px] z-10">
             
-            {{-- フェーズ1: じゃんけんボタン --}}
+            {{-- フェーズ1: じゃんけん --}}
             <div id="janken-panel" class="flex justify-center gap-4 mb-4 hidden">
                 <button onclick="playJanken(0)" class="w-20 h-20 bg-gray-200 border-b-4 border-gray-400 active:border-b-0 active:mt-1 rounded text-2xl hover:bg-gray-300 flex flex-col items-center justify-center">
-                    <span>✊</span>
-                    <span class="text-xs text-gray-500 mt-1">(1 / Z)</span>
+                    <span>✊</span><span class="text-xs text-gray-500 mt-1">(1 / Z)</span>
                 </button>
                 <button onclick="playJanken(1)" class="w-20 h-20 bg-gray-200 border-b-4 border-gray-400 active:border-b-0 active:mt-1 rounded text-2xl hover:bg-gray-300 flex flex-col items-center justify-center">
-                    <span>✌️</span>
-                    <span class="text-xs text-gray-500 mt-1">(2 / X)</span>
+                    <span>✌️</span><span class="text-xs text-gray-500 mt-1">(2 / X)</span>
                 </button>
                 <button onclick="playJanken(2)" class="w-20 h-20 bg-gray-200 border-b-4 border-gray-400 active:border-b-0 active:mt-1 rounded text-2xl hover:bg-gray-300 flex flex-col items-center justify-center">
-                    <span>🖐</span>
-                    <span class="text-xs text-gray-500 mt-1">(3 / C)</span>
+                    <span>🖐</span><span class="text-xs text-gray-500 mt-1">(3 / C)</span>
                 </button>
             </div>
 
-            {{-- フェーズ2: アクションボタン --}}
-            <div id="action-panel" class="flex justify-between px-20 hidden">
-                <div class="flex flex-col items-center">
-                    <button id="btn-attack" onclick="doAction('attack')" disabled class="w-32 h-24 bg-red-600 text-white font-black text-xl border-b-8 border-red-800 rounded disabled:bg-gray-400 disabled:border-gray-500 disabled:cursor-not-allowed">
+            {{-- フェーズ2: アクション --}}
+            <div id="action-panel" class="flex justify-between px-10 hidden w-full">
+                <div class="flex flex-col items-center w-32">
+                    <button id="btn-attack" onclick="doAction('attack')" disabled class="w-32 h-24 bg-red-600 text-white font-black text-xl border-b-8 border-red-800 rounded disabled:bg-gray-400 disabled:border-gray-500 disabled:cursor-not-allowed hover:bg-red-500 active:border-b-0 active:mt-2 transition-all">
                         叩く！<br><span class="text-xs">(← / A)</span>
                     </button>
                 </div>
-                <div class="flex flex-col items-center justify-end">
-                    <button id="btn-reset" onclick="startTutorial()" class="hidden px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 text-sm">もう一回</button>
+                <div class="flex flex-col items-center w-32">
+                    <button id="btn-aiko" onclick="doAction('aiko')" disabled class="w-32 h-24 bg-green-600 text-white font-black text-xl border-b-8 border-green-800 rounded disabled:bg-gray-400 disabled:border-gray-500 disabled:cursor-not-allowed hover:bg-green-500 active:border-b-0 active:mt-2 transition-all">
+                        あいこ<br><span class="text-xs">(↓ / S)</span>
+                    </button>
+                    <button id="btn-reset" onclick="startTutorial()" class="hidden w-40 h-16 bg-blue-500 text-white font-bold rounded shadow-lg hover:bg-blue-600 text-xl border-b-4 border-blue-700 active:border-b-0 active:mt-1">
+                        もう一回
+                    </button>
                 </div>
-                <div class="flex flex-col items-center">
-                    <button id="btn-defend" onclick="doAction('defend')" disabled class="w-32 h-24 bg-blue-600 text-white font-black text-xl border-b-8 border-blue-800 rounded disabled:bg-gray-400 disabled:border-gray-500 disabled:cursor-not-allowed">
+                <div class="flex flex-col items-center w-32">
+                    <button id="btn-defend" onclick="doAction('defend')" disabled class="w-32 h-24 bg-blue-600 text-white font-black text-xl border-b-8 border-blue-800 rounded disabled:bg-gray-400 disabled:border-gray-500 disabled:cursor-not-allowed hover:bg-blue-500 active:border-b-0 active:mt-2 transition-all">
                         被る！<br><span class="text-xs">(→ / D)</span>
                     </button>
                 </div>
@@ -85,42 +96,24 @@
 
         {{-- ■ 煽りオーバーレイ ■ --}}
         <div id="troll-overlay" class="hidden fixed inset-0 bg-black bg-opacity-80 z-[100] flex flex-col items-center justify-center">
-            <div class="text-white text-9xl font-black mb-4 animate-bounce">
-                m9(^Д^)
-            </div>
-            <p class="text-white text-3xl font-bold">プギャーｗｗｗ</p>
+            <div class="text-white text-9xl font-black mb-4 animate-bounce">m9(^Д^)</div>
+            <p id="troll-text" class="text-white text-3xl font-bold">プギャーｗｗｗ</p>
             <p class="text-gray-300 mt-4">ミス乙ｗｗｗ</p>
         </div>
 
-        {{-- ■ 強制チュートリアルオーバーレイ ■ --}}
+        {{-- ■ チュートリアル ■ --}}
         <div id="tutorial-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-95 z-[200] flex flex-col items-center justify-center p-8">
             <div class="bg-white p-8 rounded-lg max-w-2xl w-full text-center border-4 border-blue-500 shadow-2xl relative">
-                
-                {{-- ページ番号 --}}
                 <h3 class="text-2xl font-bold mb-4 border-b-2 border-gray-200 pb-2">
-                    チュートリアル (<span id="tutorial-page-num">1</span>/10)
+                    チュートリアル (<span id="tutorial-page-num">1</span>/30)
                 </h3>
-                
-                {{-- 本文 --}}
-                <p id="tutorial-text" class="text-lg mb-8 min-h-[100px] flex items-center justify-center font-bold px-8">
-                    </p>
-
-                {{-- ■■■ 矢印操作エリア ■■■ --}}
+                <p id="tutorial-text" class="text-lg mb-8 min-h-[100px] flex items-center justify-center font-bold px-8"></p>
                 <div class="flex justify-between items-center mt-4 px-4">
-                    {{-- 戻る矢印 --}}
-                    <button id="btn-tutorial-prev" onclick="prevTutorial()" class="text-5xl font-black text-gray-400 hover:text-blue-600 transition-colors p-2 select-none">
-                        ←
-                    </button>
-                    
-                    {{-- 次へ矢印 --}}
-                    <button id="btn-tutorial-next" onclick="nextTutorial()" class="text-5xl font-black text-blue-600 hover:text-blue-800 transition-colors p-2 select-none animate-pulse">
-                        →
-                    </button>
+                    <button id="btn-tutorial-prev" onclick="prevTutorial()" class="text-5xl font-black text-gray-400 hover:text-blue-600 transition-colors p-2 select-none">←</button>
+                    <button id="btn-tutorial-next" onclick="nextTutorial()" class="text-5xl font-black text-blue-600 hover:text-blue-800 transition-colors p-2 select-none animate-pulse">→</button>
                 </div>
-
             </div>
         </div>
-
     </div>
 
     {{-- ■ JavaScriptロジック ■ --}}
@@ -128,18 +121,44 @@
         let gameState = 'tutorial'; 
         let myResult = null; 
         let tutorialPage = 0;
+        let timerInterval = null;
+
+        // ★★★ 画像枚数設定（環境に合わせて変更してください） ★★★
+        const totalCharImages = 3;   
+        const totalHammerImages = 3; 
+        const totalBgImages = 3;     
+        const totalHelmetImages = 3; // 新しく追加
 
         const tutorialTexts = [
             "ようこそ。「叩いて被ってじゃんけんぽん」の世界へ。",
-            "このゲームは、高度な心理戦と反射神経が要求される。",
-            "まず、じゃんけんとは何かを知る必要がある。",
-            "グーはチョキに勝ち、チョキはパーに勝つ。",
-            "そしてパーはグーに勝つ。これが宇宙の理（ことわり）だ。",
-            "勝ったら「叩く」。負けたら「被る」。シンプルだが奥が深い。",
-            "画面上の文字は信用するな。嘘つきだ。",
-            "自分の頭上と、相手の頭上に出た「手」だけを信じろ。",
-            "敵は50%の確率で後出し（イカサマ）をしてくる。",
-            "準備はいいか？ 本当にいいか？ では始めよう。"
+            "これから君には、過酷な試練に挑んでもらう。",
+            "ルールはシンプルだ。だが、それゆえに奥が深い。",
+            "まず、じゃんけんを行う。",
+            "グーはチョキに勝つ。これは基本だ。",
+            "チョキはパーに勝つ。これも基本だ。",
+            "パーはグーに勝つ。テストに出るぞ。",
+            "勝ったら左の「叩く」ボタンを押せ。",
+            "負けたら右の「被る」ボタンを押せ。",
+            "ここからが重要だ。よく聞け。",
+            "あいこの時は、真ん中の「あいこ」ボタンを押せ。",
+            "甘えるな。あいこもまた、戦いなのだ。",
+            "そして、画面上の文字は全て嘘だ。",
+            "「勝った！」と書いてあっても信じるな。",
+            "自分の目だけを信じろ。",
+            "さらに、制限時間はたったの1秒だ。",
+            "1秒以内に判断し、ボタンを押さなければ即死だ。",
+            "人間は1秒あれば人生を変えられる。",
+            "君ならできるはずだ。",
+            "できないなら、君はその程度の存在ということだ。",
+            "敵はランダムに行動する。",
+            "予測は不可能。反射神経のみが頼りだ。",
+            "準備運動は済ませたか？",
+            "瞬きは許されない。",
+            "呼吸も忘れるな。",
+            "指の震えを止めろ。",
+            "恐怖に打ち勝て。",
+            "さあ、伝説の始まりだ。",
+            "幸運を祈る。健闘を祈る。"
         ];
 
         const els = {
@@ -148,28 +167,77 @@
             actionPanel: document.getElementById('action-panel'),
             btnAttack: document.getElementById('btn-attack'),
             btnDefend: document.getElementById('btn-defend'),
+            btnAiko: document.getElementById('btn-aiko'), 
             btnReset: document.getElementById('btn-reset'),
             player: document.getElementById('player'),
             cpu: document.getElementById('cpu'),
+            playerImg: document.getElementById('player-img'),
+            cpuImg: document.getElementById('cpu-img'),
             playerHandDisplay: document.getElementById('player-hand-display'),
             cpuHandDisplay: document.getElementById('cpu-hand-display'),
-            playerHammer: document.getElementById('player-hammer'),
-            playerHelmet: document.getElementById('player-helmet'),
-            cpuHammer: document.getElementById('cpu-hammer'),
-            cpuHelmet: document.getElementById('cpu-helmet'),
+            playerHammerImg: document.getElementById('player-hammer-img'),
+            // ヘルメットのIDを画像用のものに変更
+            playerHelmetImg: document.getElementById('player-helmet-img'),
+            cpuHammerImg: document.getElementById('cpu-hammer-img'),
+            cpuHelmetImg: document.getElementById('cpu-helmet-img'), 
             trollOverlay: document.getElementById('troll-overlay'),
+            trollText: document.getElementById('troll-text'),
             tutorialOverlay: document.getElementById('tutorial-overlay'),
             tutorialText: document.getElementById('tutorial-text'),
             tutorialPageNum: document.getElementById('tutorial-page-num'),
             btnTutPrev: document.getElementById('btn-tutorial-prev'),
-            btnTutNext: document.getElementById('btn-tutorial-next'),
+            timerBar: document.getElementById('timer-bar'),
+            bgImg: document.getElementById('bg-img'),
         };
 
         const handEmojis = ["✊", "✌️", "🖐"];
 
         window.onload = function() {
+            setRandomImages();
             startTutorial();
         };
+
+        // PNGを試し、ダメならWebPにする関数
+        function setImage(imgElem, folder, num) {
+            imgElem.onerror = null;
+            imgElem.src = `/images/games/janken/${folder}/${num}.png`;
+            imgElem.onerror = function() {
+                this.onerror = null; 
+                this.src = `/images/games/janken/${folder}/${num}.webp`;
+            };
+        }
+
+        function setRandomImages() {
+            // キャラ
+            const pNum = Math.floor(Math.random() * totalCharImages) + 1;
+            const cNum = Math.floor(Math.random() * totalCharImages) + 1;
+            setImage(els.playerImg, 'chars', pNum);
+            setImage(els.cpuImg, 'chars', cNum);
+
+            // ハンマー
+            const phNum = Math.floor(Math.random() * totalHammerImages) + 1;
+            const chNum = Math.floor(Math.random() * totalHammerImages) + 1;
+            setImage(els.playerHammerImg, 'hammers', phNum);
+            setImage(els.cpuHammerImg, 'hammers', chNum);
+
+            // ヘルメット (新規追加)
+            const phlmNum = Math.floor(Math.random() * totalHelmetImages) + 1;
+            const chlmNum = Math.floor(Math.random() * totalHelmetImages) + 1;
+            setImage(els.playerHelmetImg, 'helmets', phlmNum);
+            setImage(els.cpuHelmetImg, 'helmets', chlmNum);
+
+            // 背景 (png/webp/jpg混在対応)
+            const bgNum = Math.floor(Math.random() * totalBgImages) + 1;
+            els.bgImg.onerror = null;
+            els.bgImg.src = `/images/games/janken/bgs/${bgNum}.png`;
+            els.bgImg.onerror = function() {
+                this.src = `/images/games/janken/bgs/${bgNum}.webp`;
+                this.onerror = function() {
+                    this.src = `/images/games/janken/bgs/${bgNum}.jpg`;
+                    this.onerror = null;
+                }
+            };
+        }
 
         function startTutorial() {
             resetGameUI(); 
@@ -179,7 +247,6 @@
             updateTutorialUI();
         }
 
-        // ■■■ 戻る処理の追加 ■■■
         function prevTutorial() {
             if (tutorialPage > 0) {
                 tutorialPage--;
@@ -202,24 +269,15 @@
         function updateTutorialUI() {
             els.tutorialText.innerText = tutorialTexts[tutorialPage];
             els.tutorialPageNum.innerText = tutorialPage + 1;
-
-            // 1ページ目は「戻る」を隠す（または無効化っぽく見せる）
-            if (tutorialPage === 0) {
-                els.btnTutPrev.style.visibility = 'hidden';
-            } else {
-                els.btnTutPrev.style.visibility = 'visible';
-            }
+            els.btnTutPrev.style.visibility = (tutorialPage === 0) ? 'hidden' : 'visible';
         }
 
         document.addEventListener('keydown', (e) => {
-            
-            // ■■■ チュートリアル中のキー操作 (← →) ■■■
             if (gameState === 'tutorial') {
                 if (e.key === 'ArrowRight') nextTutorial();
                 if (e.key === 'ArrowLeft') prevTutorial();
                 return;
             }
-
             if (gameState === 'janken') {
                 if (e.key === '1' || e.key === 'z' || e.key === 'Z') playJanken(0);
                 if (e.key === '2' || e.key === 'x' || e.key === 'X') playJanken(1);
@@ -232,26 +290,20 @@
                 if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
                     if (!els.btnDefend.disabled) doAction('defend');
                 }
+                if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+                    if (!els.btnAiko.disabled) doAction('aiko');
+                }
             }
         });
 
         function playJanken(playerHand) {
-            const isCheating = Math.random() < 0.5;
-            let cpuHand;
-            if (isCheating) {
-                cpuHand = (playerHand + 2) % 3; 
-            } else {
-                cpuHand = Math.floor(Math.random() * 3);
-            }
-
-            console.log(`Cheat: ${isCheating}, Player: ${playerHand}, CPU: ${cpuHand}`);
+            const cpuHand = Math.floor(Math.random() * 3);
+            console.log(`Player: ${playerHand}, CPU: ${cpuHand}`);
 
             els.playerHandDisplay.innerText = handEmojis[playerHand];
             els.cpuHandDisplay.innerText = handEmojis[cpuHand];
 
             const resultVal = (playerHand - cpuHand + 3) % 3;
-
-            // 嘘つきテキスト（3種類のみ）
             const randomTexts = ["勝った！", "負けた！", "あいこ！"];
             const lieText = randomTexts[Math.floor(Math.random() * randomTexts.length)];
             
@@ -263,54 +315,98 @@
                 els.mainText.classList.add('text-blue-600');
             }
 
-            if (resultVal === 0) {
-                return; 
-            }
-
             gameState = 'action';
             els.jankenPanel.classList.add('hidden');
             els.actionPanel.classList.remove('hidden');
             els.actionPanel.classList.add('flex');
 
-            if (resultVal === 2) {
-                myResult = 'win';
-            } else {
-                myResult = 'lose';
-            }
+            if (resultVal === 2) myResult = 'win';
+            else if (resultVal === 1) myResult = 'lose';
+            else myResult = 'draw';
             
             els.btnAttack.disabled = false;
             els.btnDefend.disabled = false;
+            els.btnAiko.disabled = false;
+            els.btnAiko.classList.remove('hidden');
+            els.btnReset.classList.add('hidden'); 
+
+            startTimer();
+        }
+
+        function startTimer() {
+            els.timerBar.classList.remove('hidden');
+            els.timerBar.style.width = '100%';
+            els.timerBar.style.transition = 'none'; 
+            void els.timerBar.offsetWidth;
+            els.timerBar.style.transition = 'width 1s linear';
+            els.timerBar.style.width = '0%';
+
+            if (timerInterval) clearTimeout(timerInterval);
+            timerInterval = setTimeout(() => {
+                if (gameState === 'action') {
+                    showTrollOverlay("時間切れ乙ｗｗｗ");
+                }
+            }, 1000); 
+        }
+
+        function stopTimer() {
+            if (timerInterval) clearTimeout(timerInterval);
+            els.timerBar.classList.add('hidden');
         }
 
         function doAction(actionType) {
             if (gameState !== 'action') return;
+            
+            stopTimer(); 
             gameState = 'result';
 
             els.btnAttack.disabled = true;
             els.btnDefend.disabled = true;
+            els.btnAiko.disabled = true;
 
             let isSuccess = false;
             if (myResult === 'win' && actionType === 'attack') isSuccess = true;
-            if (myResult === 'lose' && actionType === 'defend') isSuccess = true;
+            else if (myResult === 'lose' && actionType === 'defend') isSuccess = true;
+            else if (myResult === 'draw' && actionType === 'aiko') isSuccess = true;
 
             if (isSuccess) {
-                if (actionType === 'attack') renderResult('hit_success');
-                else renderResult('guard_success');
-                
-                setTimeout(() => {
-                    els.btnReset.classList.remove('hidden');
-                }, 1000);
-
+                if (actionType === 'attack') {
+                    renderResult('hit_success');
+                    showResetButton();
+                } else if (actionType === 'defend') {
+                    renderResult('guard_success');
+                    showResetButton();
+                } else {
+                    els.mainText.innerText = "セーフ！";
+                    setTimeout(() => {
+                        resetGameUI(); 
+                        els.mainText.innerText = "じゃんけん...";
+                        gameState = 'janken';
+                    }, 500);
+                }
             } else {
-                showTrollOverlay();
+                showTrollOverlay("ミス乙ｗｗｗ");
             }
         }
 
-        function showTrollOverlay() {
+        function showResetButton() {
+             setTimeout(() => {
+                els.btnAiko.classList.add('hidden'); 
+                els.btnAttack.classList.add('hidden'); 
+                els.btnDefend.classList.add('hidden'); 
+                els.btnReset.classList.remove('hidden'); 
+            }, 1000);
+        }
+
+        function showTrollOverlay(msg) {
+            els.trollText.innerText = msg;
             els.trollOverlay.classList.remove('hidden');
             setTimeout(() => {
                 els.trollOverlay.classList.add('hidden');
-                els.mainText.innerText = "残念でしたｗｗｗ";
+                
+                els.btnAiko.classList.add('hidden');
+                els.btnAttack.classList.add('hidden'); 
+                els.btnDefend.classList.add('hidden'); 
                 els.btnReset.classList.remove('hidden');
             }, 3000);
         }
@@ -318,24 +414,48 @@
         function renderResult(type) {
             if (type === 'hit_success') {
                 els.mainText.innerText = "HIT!!!";
-                els.playerHammer.classList.remove('hidden');
-                els.playerHammer.style.width = '1200px'; 
-                els.playerHammer.style.transform = 'rotate(0deg)';
-                els.playerHammer.style.right = '-1100px'; 
-                els.playerHammer.style.top = '20px';
+                els.playerHammerImg.classList.remove('hidden');
+                
+                // ★修正1: 画像を枠いっぱいに無理やり引き伸ばす！
+                els.playerHammerImg.style.objectFit = "fill"; 
+
+                // ★修正2: 位置の基準を「自分(left)」からにして、画面右へ突き出す
+                els.playerHammerImg.style.width = '2000px'; 
+                els.playerHammerImg.style.height = '300px'; 
+                els.playerHammerImg.style.transform = 'rotate(0deg)';
+                
+                // 自分の体の少し右(100px)からスタートさせる
+                els.playerHammerImg.style.right = 'auto'; // right指定を解除
+                els.playerHammerImg.style.left = '100px'; 
+                els.playerHammerImg.style.top = '50px';
+
+                // デバッグの枠線は消す
+                els.playerHammerImg.style.border = 'none';
 
                 els.cpu.style.transition = 'none';
-                els.cpu.style.right = '-200px'; 
+                els.cpu.style.right = '-300px'; 
                 els.cpu.style.transform = 'rotate(90deg)';
-                els.cpu.classList.add('bg-gray-600');
 
             } else if (type === 'guard_success') {
                 els.mainText.innerText = "SAFE!!!";
-                els.playerHelmet.classList.remove('hidden');
-                els.cpuHammer.classList.remove('hidden');
-                els.cpuHammer.style.width = '1200px'; 
-                els.cpuHammer.style.transform = 'rotate(0deg)';
-                els.cpuHammer.style.left = '-1100px';
+                els.playerHelmetImg.classList.remove('hidden');
+                els.cpuHammerImg.classList.remove('hidden');
+                
+                // ★修正1: こちらも引き伸ばす
+                els.cpuHammerImg.style.objectFit = "fill";
+
+                els.cpuHammerImg.style.width = '2000px';
+                els.cpuHammerImg.style.height = '300px';
+                els.cpuHammerImg.style.transform = 'rotate(0deg)';
+                
+                // ★修正2: 相手の体の少し左(-1900px)からスタートして画面左へ突き出す
+                // (widthが2000pxあるので、leftを大きくマイナスにする必要がある)
+                els.cpuHammerImg.style.left = 'auto'; // left指定を解除
+                els.cpuHammerImg.style.right = '100px';
+                els.cpuHammerImg.style.top = '50px';
+                
+                els.cpuHammerImg.style.border = 'none';
+                
                 els.player.style.transform = 'translateY(10px)';
             }
         }
@@ -343,31 +463,38 @@
         function resetGameUI() {
             gameState = 'reset';
             myResult = null;
+            stopTimer(); 
+            setRandomImages();
+
             els.mainText.innerText = "START";
             
-            els.jankenPanel.classList.add('hidden');
+            els.jankenPanel.classList.remove('hidden'); 
             els.actionPanel.classList.add('hidden');
             els.actionPanel.classList.remove('flex');
+            
+            els.btnAttack.classList.remove('hidden');
+            els.btnDefend.classList.remove('hidden');
+            els.btnAiko.classList.remove('hidden');
             els.btnReset.classList.add('hidden');
             
-            els.playerHammer.classList.add('hidden');
-            els.playerHelmet.classList.add('hidden');
-            els.cpuHammer.classList.add('hidden');
-            els.cpuHelmet.classList.add('hidden');
+            els.playerHammerImg.classList.add('hidden');
+            els.playerHelmetImg.classList.add('hidden');
+            els.cpuHammerImg.classList.add('hidden');
+            els.cpuHelmetImg.classList.add('hidden');
             
             els.playerHandDisplay.innerText = "";
             els.cpuHandDisplay.innerText = "";
             
-            els.playerHammer.style = '';
-            els.cpuHammer.style = '';
+            // スタイルリセット
+            els.playerHammerImg.style = '';
+            els.cpuHammerImg.style = '';
             
             els.cpu.style = '';
-            els.cpu.classList.remove('bg-gray-600');
             els.player.style = '';
-            els.player.classList.remove('bg-gray-600');
             
             els.btnAttack.disabled = true;
             els.btnDefend.disabled = true;
+            els.btnAiko.disabled = true;
         }
     </script>
 </x-app-layout>
