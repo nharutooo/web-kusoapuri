@@ -44,7 +44,7 @@
                     >
                         <img
                             id="hayaoshiButton"
-                            src="{{ asset('hayaoshi_button.png') }}"
+                            src="{{ asset('images/hayaoshi_button.png') }}"
                             alt="早押しボタン"
                             class="absolute left-0 top-0 w-full max-w-[32px] cursor-pointer select-none transition-transform duration-300 ease-out opacity-0"
                         />
