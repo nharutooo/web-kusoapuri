@@ -1,6 +1,6 @@
 @php
     $isTutorial = $initialTutorial ?? false;
-    $toggleTarget = $isTutorial ? route('hayaoshi.main') : route('hayaoshi.tutorial');
+    $toggleTarget = $isTutorial ? route('games.hayaoshi.main') : route('games.hayaoshi.tutorial');
     $toggleLabel = $isTutorial ? '本番へ' : 'チュートリアルへ';
     $title = $isTutorial ? '早押しゲーム（デモプレイ）' : '早押しゲーム（本番）';
 @endphp
