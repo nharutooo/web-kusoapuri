@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Games\ShinkeiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Games\JankenController;
+
+Route::get('/games/shinkei', [ShinkeiController::class, 'index'])->name('games.shinkei');
 
 Route::get('/', function () {
     return view('welcome');
