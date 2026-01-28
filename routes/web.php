@@ -8,10 +8,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::view('/hayaoshi', 'hayaoshi')->name('hayaoshi');
-Route::view('/hayaoshi/tutorial', 'hayaoshi.play', ['initialTutorial' => true])->name('hayaoshi.tutorial');
-Route::view('/hayaoshi/main', 'hayaoshi.play', ['initialTutorial' => false])->name('hayaoshi.main');
-
+Route::view('/hayaoshi', 'games.Hayaoshi.index')->name('hayaoshi');
+Route::view('/hayaoshi/tutorial', 'games.Hayaoshi.play', ['initialTutorial' => true])->name('hayaoshi.tutorial');
+Route::view('/hayaoshi/main', 'games.Hayaoshi.play', ['initialTutorial' => false])->name('hayaoshi.main');
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
