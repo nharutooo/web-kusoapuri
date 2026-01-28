@@ -124,10 +124,10 @@
         let timerInterval = null;
 
         // ★★★ 画像枚数設定（環境に合わせて変更してください） ★★★
-        const totalCharImages = 3;   
-        const totalHammerImages = 3; 
-        const totalBgImages = 3;     
-        const totalHelmetImages = 3; // 新しく追加
+        const totalCharImages = 10;   
+        const totalHammerImages = 10; 
+        const totalBgImages = 7;     
+        const totalHelmetImages = 8;
 
         const tutorialTexts = [
             "ようこそ。「叩いて被ってじゃんけんぽん」の世界へ。",
@@ -196,14 +196,31 @@
             setRandomImages();
             startTutorial();
         };
-
-        // PNGを試し、ダメならWebPにする関数
+        
+        // png -> webp -> jpg -> jpeg の順に全部試す
         function setImage(imgElem, folder, num) {
+            // エラー対応をリセット
             imgElem.onerror = null;
+
+            // 1. まず PNG を試す
             imgElem.src = `/images/games/janken/${folder}/${num}.png`;
+            
             imgElem.onerror = function() {
-                this.onerror = null; 
+                // 2. ダメなら WebP を試す
                 this.src = `/images/games/janken/${folder}/${num}.webp`;
+                
+                this.onerror = function() {
+                    // 3. ダメなら JPG (3文字) を試す
+                    this.src = `/images/games/janken/${folder}/${num}.jpg`;
+                    
+                    this.onerror = function() {
+                        // 4. ダメなら JPEG (4文字) を試す ★ここが重要！
+                        this.src = `/images/games/janken/${folder}/${num}.jpeg`;
+                        
+                        // これでもダメなら諦める
+                        this.onerror = null;
+                    }
+                }
             };
         }
 
@@ -220,23 +237,15 @@
             setImage(els.playerHammerImg, 'hammers', phNum);
             setImage(els.cpuHammerImg, 'hammers', chNum);
 
-            // ヘルメット (新規追加)
+            // ヘルメット
             const phlmNum = Math.floor(Math.random() * totalHelmetImages) + 1;
             const chlmNum = Math.floor(Math.random() * totalHelmetImages) + 1;
             setImage(els.playerHelmetImg, 'helmets', phlmNum);
             setImage(els.cpuHelmetImg, 'helmets', chlmNum);
 
-            // 背景 (png/webp/jpg混在対応)
+            // 背景（背景もこの共通関数を使えばOKです！）
             const bgNum = Math.floor(Math.random() * totalBgImages) + 1;
-            els.bgImg.onerror = null;
-            els.bgImg.src = `/images/games/janken/bgs/${bgNum}.png`;
-            els.bgImg.onerror = function() {
-                this.src = `/images/games/janken/bgs/${bgNum}.webp`;
-                this.onerror = function() {
-                    this.src = `/images/games/janken/bgs/${bgNum}.jpg`;
-                    this.onerror = null;
-                }
-            };
+            setImage(els.bgImg, 'bgs', bgNum);
         }
 
         function startTutorial() {
