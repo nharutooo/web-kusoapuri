@@ -20,10 +20,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-Route::prefix('games/janken')->name('games.janken.')->group(function () {
-    Route::get('/', [JankenController::class, 'index'])->name('index');
+    Route::get('/password-manager', [App\Http\Controllers\ExposedPasswordController::class, 'index'])->name('password.index');
+    Route::post('/password-manager', [App\Http\Controllers\ExposedPasswordController::class, 'store'])->name('password.store');
+    
+    // じゃんけん
+    Route::get('/games/janken', [JankenController::class, 'index'])->name('games.janken');
+    
+    // 早押し
+    Route::get('/games/hayaoshi', function () { return "早押しゲーム（準備中）"; })->name('games.hayaoshi');
+    
+    // 蛇
+    Route::get('/games/hebi', function () { return "ヘビゲーム（準備中）"; })->name('games.hebi');
+    
+    // 神経衰弱
+    Route::get('/games/shinkei', function () { return "神経衰弱（準備中）"; })->name('games.shinkei');
 });
 
 require __DIR__.'/auth.php';
