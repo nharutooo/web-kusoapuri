@@ -5,6 +5,7 @@ use App\Http\Controllers\Games\HayaoshiController;
 use App\Http\Controllers\Games\ShinkeiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Games\JankenController;
+use App\Http\Controllers\Games\HebiController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -30,7 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/games/hayaoshi/main', [HayaoshiController::class, 'main'])->name('games.hayaoshi.main');
 
     // 蛇
-    Route::get('/games/hebi', function () { return "ヘビゲーム（準備中）"; })->name('games.hebi');
+    Route::get('/games/hebi', [JankenController::class, 'index'])->name('games.hebi');
 
     // 神経衰弱
     Route::get('/games/shinkei', [ShinkeiController::class, 'index'])->name('games.shinkei');
