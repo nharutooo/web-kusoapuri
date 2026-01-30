@@ -31,7 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/games/hayaoshi/main', [HayaoshiController::class, 'main'])->name('games.hayaoshi.main');
 
     // 蛇
-    Route::get('/games/hebi', [JankenController::class, 'index'])->name('games.hebi');
+    Route::get('/games/hebi', [HebiController::class, 'index'])->name('games.hebi');
 
     // 神経衰弱
     Route::get('/games/shinkei', [ShinkeiController::class, 'index'])->name('games.shinkei');

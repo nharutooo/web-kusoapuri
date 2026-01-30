@@ -5,7 +5,7 @@ namespace App\Http\Controllers\games;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class HebiControllers extends Controller
+class HebiController extends Controller
 {
     private array $ladders = [
         1 => 38, 4 => 14, 9 => 31, 21 => 42,
