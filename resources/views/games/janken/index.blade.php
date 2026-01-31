@@ -18,7 +18,7 @@
         <div class="relative w-[98%] h-[650px] bg-white border-4 border-black overflow-hidden shadow-2xl rounded-sm">
             
             {{-- 背景画像 --}}
-            <img id="bg-img" src="" class="absolute inset-0 w-full h-full object-cover opacity-70 z-0 pointer-events-none">
+            <img id="bg-img" src="" class="absolute inset-0 w-full h-full object-fill opacity-70 z-0 pointer-events-none">
             <div class="absolute bottom-0 w-full h-16 bg-green-700 z-0 opacity-80"></div> 
 
             {{-- 制限時間バー --}}
@@ -32,10 +32,10 @@
                 {{-- 自分の手 --}}
                 <div id="player-hand-display" class="absolute -top-40 left-0 w-full text-center text-8xl drop-shadow-md transition-transform duration-100 z-30"></div>
 
-                {{-- ハンマー（通常サイズを少し大きく: w-48 h-48） --}}
+                {{-- ハンマー --}}
                 <img id="player-hammer-img" src="" class="hidden absolute -right-32 top-0 w-48 h-48 object-contain transform rotate-12 origin-left z-20 drop-shadow-xl">
 
-                {{-- ★★★ ヘルメット（画像化） ★★★ --}}
+                {{-- ヘルメット --}}
                 <img id="player-helmet-img" src="" class="hidden absolute -top-24 left-4 w-56 h-56 object-contain z-20 drop-shadow-xl">
             </div>
 
@@ -50,7 +50,7 @@
                 {{-- ハンマー --}}
                 <img id="cpu-hammer-img" src="" class="hidden absolute -left-32 top-0 w-48 h-48 object-contain transform -rotate-12 origin-right z-20 drop-shadow-xl">
 
-                {{-- ★★★ ヘルメット（画像化） ★★★ --}}
+                {{-- ヘルメット --}}
                 <img id="cpu-helmet-img" src="" class="hidden absolute -top-24 left-4 w-56 h-56 object-contain z-20 drop-shadow-xl">
             </div>
         </div>
@@ -94,18 +94,17 @@
             </div>
         </div>
 
-        {{-- ■ 煽りオーバーレイ ■ --}}
-        <div id="troll-overlay" class="hidden fixed inset-0 bg-black bg-opacity-80 z-[100] flex flex-col items-center justify-center">
-            <div class="text-white text-9xl font-black mb-4 animate-bounce">m9(^Д^)</div>
-            <p id="troll-text" class="text-white text-3xl font-bold">プギャーｗｗｗ</p>
-            <p class="text-gray-300 mt-4">ミス乙ｗｗｗ</p>
+        {{-- ■ 煽りオーバーレイ（画像版） ■ --}}
+        <div id="troll-overlay" class="hidden fixed inset-0 bg-black bg-opacity-80 z-[100] flex flex-col items-center justify-center pointer-events-none">
+            {{-- 文字は削除して、画像を表示するタグを追加 --}}
+            <img id="troll-img" src="" class="max-w-[80%] max-h-[80%] object-contain animate-bounce drop-shadow-2xl">
         </div>
 
         {{-- ■ チュートリアル ■ --}}
         <div id="tutorial-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-95 z-[200] flex flex-col items-center justify-center p-8">
             <div class="bg-white p-8 rounded-lg max-w-2xl w-full text-center border-4 border-blue-500 shadow-2xl relative">
                 <h3 class="text-2xl font-bold mb-4 border-b-2 border-gray-200 pb-2">
-                    チュートリアル (<span id="tutorial-page-num">1</span>/30)
+                    チュートリアル (<span id="tutorial-page-num">1</span>/50)
                 </h3>
                 <p id="tutorial-text" class="text-lg mb-8 min-h-[100px] flex items-center justify-center font-bold px-8"></p>
                 <div class="flex justify-between items-center mt-4 px-4">
@@ -123,11 +122,24 @@
         let tutorialPage = 0;
         let timerInterval = null;
 
-        // ★★★ 画像枚数設定（環境に合わせて変更してください） ★★★
+        // ★★★ 画像枚数設定 ★★★
         const totalCharImages = 10;   
         const totalHammerImages = 10; 
         const totalBgImages = 7;     
         const totalHelmetImages = 8;
+        const totalFadeImages = 6;
+
+        // ★★★ 音源設定 ★★★
+        const sounds = {
+            bgm: new Audio('/sounds/games/janken/bgm.mp3'),
+            pon: new Audio('/sounds/games/janken/pon.mp3'),
+            hit: new Audio('/sounds/games/janken/hit.mp3'),
+            guard: new Audio('/sounds/games/janken/guard.mp3'),
+            miss: new Audio('/sounds/games/janken/miss.mp3'),
+            decide: new Audio('/sounds/games/janken/decide.mp3')
+        };
+        sounds.bgm.loop = true; 
+        sounds.bgm.volume = 0.3;
 
         const tutorialTexts = [
             "ようこそ。「叩いて被ってじゃんけんぽん」の世界へ。",
@@ -158,7 +170,28 @@
             "指の震えを止めろ。",
             "恐怖に打ち勝て。",
             "さあ、伝説の始まりだ。",
-            "幸運を祈る。健闘を祈る。"
+            "幸運を祈る。健闘を祈る。",
+            "……とでも言うと思ったか？",
+            "まだ終わりではない。",
+            "君は「長い」と思っているだろう。",
+            "その「焦り」こそが最大の敵だ。",
+            "敵は君のイライラを待っている。",
+            "画面の向こうで、おじさんが笑っているぞ。",
+            "そう、さっきの指差してくるおじさんだ。",
+            "あいつは君のミスを待っている。",
+            "夢に出てくるかもしれない。",
+            "うなされる準備はできているか？",
+            "ちなみに、このゲームにポーズ機能はない。",
+            "トイレに行くなら今のうちだ。",
+            "水分補給も忘れるな。",
+            "脱水症状はこのゲームの天敵だ。",
+            "画面を叩き割りたくなる衝動を抑えろ。",
+            "ディスプレイは高い。",
+            "マウスも投げつけるな。",
+            "全ては自己責任だ。",
+            "ここまで読んだ君の忍耐力は本物だ。",
+            "その忍耐力があれば、きっと勝てる。",
+            "さあ、今度こそ本当のスタートだ。"
         ];
 
         const els = {
@@ -176,12 +209,11 @@
             playerHandDisplay: document.getElementById('player-hand-display'),
             cpuHandDisplay: document.getElementById('cpu-hand-display'),
             playerHammerImg: document.getElementById('player-hammer-img'),
-            // ヘルメットのIDを画像用のものに変更
             playerHelmetImg: document.getElementById('player-helmet-img'),
             cpuHammerImg: document.getElementById('cpu-hammer-img'),
             cpuHelmetImg: document.getElementById('cpu-helmet-img'), 
             trollOverlay: document.getElementById('troll-overlay'),
-            trollText: document.getElementById('troll-text'),
+            trollImg: document.getElementById('troll-img'), // ★追加
             tutorialOverlay: document.getElementById('tutorial-overlay'),
             tutorialText: document.getElementById('tutorial-text'),
             tutorialPageNum: document.getElementById('tutorial-page-num'),
@@ -197,27 +229,15 @@
             startTutorial();
         };
         
-        // png -> webp -> jpg -> jpeg の順に全部試す
         function setImage(imgElem, folder, num) {
-            // エラー対応をリセット
             imgElem.onerror = null;
-
-            // 1. まず PNG を試す
             imgElem.src = `/images/games/janken/${folder}/${num}.png`;
-            
             imgElem.onerror = function() {
-                // 2. ダメなら WebP を試す
                 this.src = `/images/games/janken/${folder}/${num}.webp`;
-                
                 this.onerror = function() {
-                    // 3. ダメなら JPG (3文字) を試す
                     this.src = `/images/games/janken/${folder}/${num}.jpg`;
-                    
                     this.onerror = function() {
-                        // 4. ダメなら JPEG (4文字) を試す ★ここが重要！
                         this.src = `/images/games/janken/${folder}/${num}.jpeg`;
-                        
-                        // これでもダメなら諦める
                         this.onerror = null;
                     }
                 }
@@ -225,25 +245,21 @@
         }
 
         function setRandomImages() {
-            // キャラ
             const pNum = Math.floor(Math.random() * totalCharImages) + 1;
             const cNum = Math.floor(Math.random() * totalCharImages) + 1;
             setImage(els.playerImg, 'chars', pNum);
             setImage(els.cpuImg, 'chars', cNum);
 
-            // ハンマー
             const phNum = Math.floor(Math.random() * totalHammerImages) + 1;
             const chNum = Math.floor(Math.random() * totalHammerImages) + 1;
             setImage(els.playerHammerImg, 'hammers', phNum);
             setImage(els.cpuHammerImg, 'hammers', chNum);
 
-            // ヘルメット
             const phlmNum = Math.floor(Math.random() * totalHelmetImages) + 1;
             const chlmNum = Math.floor(Math.random() * totalHelmetImages) + 1;
             setImage(els.playerHelmetImg, 'helmets', phlmNum);
             setImage(els.cpuHelmetImg, 'helmets', chlmNum);
 
-            // 背景（背景もこの共通関数を使えばOKです！）
             const bgNum = Math.floor(Math.random() * totalBgImages) + 1;
             setImage(els.bgImg, 'bgs', bgNum);
         }
@@ -254,9 +270,14 @@
             tutorialPage = 0;
             els.tutorialOverlay.classList.remove('hidden');
             updateTutorialUI();
+            
+            document.body.addEventListener('click', () => {
+                sounds.bgm.play().catch(()=>{});
+            }, { once: true });
         }
 
         function prevTutorial() {
+            sounds.decide.currentTime = 0; sounds.decide.play();
             if (tutorialPage > 0) {
                 tutorialPage--;
                 updateTutorialUI();
@@ -264,6 +285,7 @@
         }
 
         function nextTutorial() {
+            sounds.decide.currentTime = 0; sounds.decide.play();
             tutorialPage++;
             if (tutorialPage >= tutorialTexts.length) {
                 els.tutorialOverlay.classList.add('hidden');
@@ -306,6 +328,8 @@
         });
 
         function playJanken(playerHand) {
+            sounds.pon.currentTime = 0; sounds.pon.play();
+            
             const cpuHand = Math.floor(Math.random() * 3);
             console.log(`Player: ${playerHand}, CPU: ${cpuHand}`);
 
@@ -353,7 +377,7 @@
             if (timerInterval) clearTimeout(timerInterval);
             timerInterval = setTimeout(() => {
                 if (gameState === 'action') {
-                    showTrollOverlay("時間切れ乙ｗｗｗ");
+                    showTrollOverlay();
                 }
             }, 1000); 
         }
@@ -373,28 +397,45 @@
             els.btnDefend.disabled = true;
             els.btnAiko.disabled = true;
 
-            let isSuccess = false;
-            if (myResult === 'win' && actionType === 'attack') isSuccess = true;
-            else if (myResult === 'lose' && actionType === 'defend') isSuccess = true;
-            else if (myResult === 'draw' && actionType === 'aiko') isSuccess = true;
-
-            if (isSuccess) {
+            if (myResult === 'win') {
                 if (actionType === 'attack') {
-                    renderResult('hit_success');
-                    showResetButton();
+                    if (Math.random() < 0.5) {
+                        renderResult('hit_success');
+                        showResetButton();
+                    } else {
+                        renderResult('cpu_guarded');
+                        showResetButton();
+                    }
                 } else if (actionType === 'defend') {
-                    renderResult('guard_success');
+                    renderResult('both_guard');
                     showResetButton();
                 } else {
+                    showTrollOverlay();
+                }
+            }
+            else if (myResult === 'lose') {
+                if (actionType === 'defend') {
+                    renderResult('guard_success');
+                    showResetButton();
+                } else if (actionType === 'attack') {
+                    renderResult('player_blown_away');
+                    showResetButton();
+                } else {
+                    showTrollOverlay();
+                }
+            }
+            else if (myResult === 'draw') {
+                if (actionType === 'aiko') {
+                    sounds.decide.currentTime = 0; sounds.decide.play();
                     els.mainText.innerText = "セーフ！";
                     setTimeout(() => {
                         resetGameUI(); 
                         els.mainText.innerText = "じゃんけん...";
                         gameState = 'janken';
                     }, 500);
+                } else {
+                    showTrollOverlay();
                 }
-            } else {
-                showTrollOverlay("ミス乙ｗｗｗ");
             }
         }
 
@@ -407,12 +448,17 @@
             }, 1000);
         }
 
-        function showTrollOverlay(msg) {
-            els.trollText.innerText = msg;
+        // ★★★ 修正: 画像をランダムに表示する煽り関数 ★★★
+        function showTrollOverlay() {
+            sounds.miss.currentTime = 0; sounds.miss.play();
+
+            // ランダムに画像を選択して表示
+            const fadeNum = Math.floor(Math.random() * totalFadeImages) + 1;
+            setImage(els.trollImg, 'fades', fadeNum);
+
             els.trollOverlay.classList.remove('hidden');
             setTimeout(() => {
                 els.trollOverlay.classList.add('hidden');
-                
                 els.btnAiko.classList.add('hidden');
                 els.btnAttack.classList.add('hidden'); 
                 els.btnDefend.classList.add('hidden'); 
@@ -422,50 +468,87 @@
 
         function renderResult(type) {
             if (type === 'hit_success') {
+                sounds.hit.currentTime = 0; sounds.hit.play();
                 els.mainText.innerText = "HIT!!!";
                 els.playerHammerImg.classList.remove('hidden');
                 
-                // ★修正1: 画像を枠いっぱいに無理やり引き伸ばす！
                 els.playerHammerImg.style.objectFit = "fill"; 
-
-                // ★修正2: 位置の基準を「自分(left)」からにして、画面右へ突き出す
                 els.playerHammerImg.style.width = '2000px'; 
                 els.playerHammerImg.style.height = '300px'; 
                 els.playerHammerImg.style.transform = 'rotate(0deg)';
-                
-                // 自分の体の少し右(100px)からスタートさせる
-                els.playerHammerImg.style.right = 'auto'; // right指定を解除
+                els.playerHammerImg.style.right = 'auto'; 
                 els.playerHammerImg.style.left = '100px'; 
                 els.playerHammerImg.style.top = '50px';
-
-                // デバッグの枠線は消す
                 els.playerHammerImg.style.border = 'none';
 
-                els.cpu.style.transition = 'none';
-                els.cpu.style.right = '-300px'; 
-                els.cpu.style.transform = 'rotate(90deg)';
+                els.cpu.style.transition = 'all 0.6s ease-in'; 
+                els.cpu.style.right = '-1500px'; 
+                els.cpu.style.transform = 'rotate(7200deg) translateY(-500px)';
+                els.cpu.style.opacity = '0';
+            } 
 
-            } else if (type === 'guard_success') {
+            else if (type === 'guard_success') {
+                sounds.guard.currentTime = 0; sounds.guard.play();
                 els.mainText.innerText = "SAFE!!!";
                 els.playerHelmetImg.classList.remove('hidden');
                 els.cpuHammerImg.classList.remove('hidden');
                 
-                // ★修正1: こちらも引き伸ばす
                 els.cpuHammerImg.style.objectFit = "fill";
-
                 els.cpuHammerImg.style.width = '2000px';
                 els.cpuHammerImg.style.height = '300px';
                 els.cpuHammerImg.style.transform = 'rotate(0deg)';
-                
-                // ★修正2: 相手の体の少し左(-1900px)からスタートして画面左へ突き出す
-                // (widthが2000pxあるので、leftを大きくマイナスにする必要がある)
-                els.cpuHammerImg.style.left = 'auto'; // left指定を解除
+                els.cpuHammerImg.style.left = 'auto'; 
                 els.cpuHammerImg.style.right = '100px';
                 els.cpuHammerImg.style.top = '50px';
-                
                 els.cpuHammerImg.style.border = 'none';
                 
                 els.player.style.transform = 'translateY(10px)';
+            }
+
+            else if (type === 'cpu_guarded') {
+                sounds.guard.currentTime = 0; sounds.guard.play();
+                els.mainText.innerText = "GUARDED!";
+                els.playerHammerImg.classList.remove('hidden');
+                els.cpuHelmetImg.classList.remove('hidden');
+
+                els.playerHammerImg.style.objectFit = "fill"; 
+                els.playerHammerImg.style.width = '2000px'; 
+                els.playerHammerImg.style.height = '300px'; 
+                els.playerHammerImg.style.transform = 'rotate(0deg)';
+                els.playerHammerImg.style.right = 'auto'; 
+                els.playerHammerImg.style.left = '100px'; 
+                els.playerHammerImg.style.top = '50px';
+                els.playerHammerImg.style.border = 'none';
+            }
+
+            else if (type === 'player_blown_away') {
+                sounds.hit.currentTime = 0; sounds.hit.play();
+                els.mainText.innerText = "OUCH!!!";
+                els.cpuHammerImg.classList.remove('hidden');
+
+                els.cpuHammerImg.style.objectFit = "fill";
+                els.cpuHammerImg.style.width = '2000px';
+                els.cpuHammerImg.style.height = '300px';
+                els.cpuHammerImg.style.transform = 'rotate(0deg)';
+                els.cpuHammerImg.style.left = 'auto'; 
+                els.cpuHammerImg.style.right = '100px';
+                els.cpuHammerImg.style.top = '50px';
+                els.cpuHammerImg.style.border = 'none';
+
+                els.player.style.transition = 'all 0.6s ease-in';
+                els.player.style.left = '-1500px';
+                els.player.style.transform = 'rotate(-7200deg) translateY(-500px)';
+                els.player.style.opacity = '0';
+            }
+
+            else if (type === 'both_guard') {
+                sounds.miss.currentTime = 0; sounds.miss.play();
+                els.mainText.innerText = "???";
+                els.playerHelmetImg.classList.remove('hidden');
+                els.cpuHelmetImg.classList.remove('hidden');
+                
+                els.player.style.transform = 'translateY(10px)';
+                els.cpu.style.transform = 'translateY(10px)';
             }
         }
 
@@ -494,12 +577,13 @@
             els.playerHandDisplay.innerText = "";
             els.cpuHandDisplay.innerText = "";
             
-            // スタイルリセット
             els.playerHammerImg.style = '';
             els.cpuHammerImg.style = '';
             
             els.cpu.style = '';
             els.player.style = '';
+            els.cpu.style.opacity = '1';
+            els.player.style.opacity = '1';
             
             els.btnAttack.disabled = true;
             els.btnDefend.disabled = true;
