@@ -96,7 +96,6 @@
 
         {{-- ■ 煽りオーバーレイ（画像版） ■ --}}
         <div id="troll-overlay" class="hidden fixed inset-0 bg-black bg-opacity-80 z-[100] flex flex-col items-center justify-center pointer-events-none">
-            {{-- 文字は削除して、画像を表示するタグを追加 --}}
             <img id="troll-img" src="" class="max-w-[80%] max-h-[80%] object-contain animate-bounce drop-shadow-2xl">
         </div>
 
@@ -122,19 +121,19 @@
         let tutorialPage = 0;
         let timerInterval = null;
 
-        // ★★★ 画像枚数設定 ★★★
         const totalCharImages = 10;   
         const totalHammerImages = 10; 
         const totalBgImages = 7;     
         const totalHelmetImages = 8;
         const totalFadeImages = 6;
 
-        // ★★★ 音源設定 ★★★
+        // ★★★ 音源設定（jankenを追加） ★★★
         const sounds = {
             bgm: new Audio('/sounds/games/janken/bgm.mp3'),
+            janken: new Audio('/sounds/games/janken/janken.mp3'), // ★追加
             pon: new Audio('/sounds/games/janken/pon.mp3'),
-            hit: new Audio('/sounds/games/janken/hit.mp3'),
-            guard: new Audio('/sounds/games/janken/guard.mp3'),
+            attack: new Audio('/sounds/games/janken/attack.mp3'),
+            defense: new Audio('/sounds/games/janken/defense.mp3'),
             miss: new Audio('/sounds/games/janken/miss.mp3'),
             decide: new Audio('/sounds/games/janken/decide.mp3')
         };
@@ -213,7 +212,7 @@
             cpuHammerImg: document.getElementById('cpu-hammer-img'),
             cpuHelmetImg: document.getElementById('cpu-helmet-img'), 
             trollOverlay: document.getElementById('troll-overlay'),
-            trollImg: document.getElementById('troll-img'), // ★追加
+            trollImg: document.getElementById('troll-img'),
             tutorialOverlay: document.getElementById('tutorial-overlay'),
             tutorialText: document.getElementById('tutorial-text'),
             tutorialPageNum: document.getElementById('tutorial-page-num'),
@@ -327,43 +326,55 @@
             }
         });
 
+        // ★★★ 修正: じゃんけん... (溜め) ... ぽん！ ★★★
         function playJanken(playerHand) {
-            sounds.pon.currentTime = 0; sounds.pon.play();
-            
-            const cpuHand = Math.floor(Math.random() * 3);
-            console.log(`Player: ${playerHand}, CPU: ${cpuHand}`);
+            // 連打防止のため一旦入力を無効化（必要なら）
+            if(gameState !== 'janken') return;
 
-            els.playerHandDisplay.innerText = handEmojis[playerHand];
-            els.cpuHandDisplay.innerText = handEmojis[cpuHand];
+            // 1. まず「じゃんけん」と喋る
+            sounds.janken.currentTime = 0; 
+            sounds.janken.play();
 
-            const resultVal = (playerHand - cpuHand + 3) % 3;
-            const randomTexts = ["勝った！", "負けた！", "あいこ！"];
-            const lieText = randomTexts[Math.floor(Math.random() * randomTexts.length)];
-            
-            els.mainText.innerText = lieText;
-            els.mainText.className = "text-6xl font-black drop-shadow-md tracking-widest";
-            if (Math.random() < 0.5) {
-                els.mainText.classList.add('text-red-600');
-            } else {
-                els.mainText.classList.add('text-blue-600');
-            }
+            // 2. 0.4秒後に「ぽん」と鳴らして手を出す
+            setTimeout(() => {
+                sounds.pon.currentTime = 0; 
+                sounds.pon.play();
+                
+                const cpuHand = Math.floor(Math.random() * 3);
+                console.log(`Player: ${playerHand}, CPU: ${cpuHand}`);
 
-            gameState = 'action';
-            els.jankenPanel.classList.add('hidden');
-            els.actionPanel.classList.remove('hidden');
-            els.actionPanel.classList.add('flex');
+                els.playerHandDisplay.innerText = handEmojis[playerHand];
+                els.cpuHandDisplay.innerText = handEmojis[cpuHand];
 
-            if (resultVal === 2) myResult = 'win';
-            else if (resultVal === 1) myResult = 'lose';
-            else myResult = 'draw';
-            
-            els.btnAttack.disabled = false;
-            els.btnDefend.disabled = false;
-            els.btnAiko.disabled = false;
-            els.btnAiko.classList.remove('hidden');
-            els.btnReset.classList.add('hidden'); 
+                const resultVal = (playerHand - cpuHand + 3) % 3;
+                const randomTexts = ["勝った！", "負けた！", "あいこ！"];
+                const lieText = randomTexts[Math.floor(Math.random() * randomTexts.length)];
+                
+                els.mainText.innerText = lieText;
+                els.mainText.className = "text-6xl font-black drop-shadow-md tracking-widest";
+                if (Math.random() < 0.5) {
+                    els.mainText.classList.add('text-red-600');
+                } else {
+                    els.mainText.classList.add('text-blue-600');
+                }
 
-            startTimer();
+                gameState = 'action';
+                els.jankenPanel.classList.add('hidden');
+                els.actionPanel.classList.remove('hidden');
+                els.actionPanel.classList.add('flex');
+
+                if (resultVal === 2) myResult = 'win';
+                else if (resultVal === 1) myResult = 'lose';
+                else myResult = 'draw';
+                
+                els.btnAttack.disabled = false;
+                els.btnDefend.disabled = false;
+                els.btnAiko.disabled = false;
+                els.btnAiko.classList.remove('hidden');
+                els.btnReset.classList.add('hidden'); 
+
+                startTimer();
+            }, 400); // ここで溜めを作る（0.4秒）
         }
 
         function startTimer() {
@@ -407,7 +418,8 @@
                         showResetButton();
                     }
                 } else if (actionType === 'defend') {
-                    renderResult('both_guard');
+                    // ★ 変更: ここは単に間違えただけなので煽り画像は出さない（miss音も鳴らさない）
+                    renderResult('both_guard'); 
                     showResetButton();
                 } else {
                     showTrollOverlay();
@@ -426,7 +438,9 @@
             }
             else if (myResult === 'draw') {
                 if (actionType === 'aiko') {
-                    sounds.decide.currentTime = 0; sounds.decide.play();
+                    // ★ 変更: あいこ成功時は無音
+                    // sounds.decide.currentTime = 0; sounds.decide.play(); // ←削除
+                    
                     els.mainText.innerText = "セーフ！";
                     setTimeout(() => {
                         resetGameUI(); 
@@ -448,11 +462,10 @@
             }, 1000);
         }
 
-        // ★★★ 修正: 画像をランダムに表示する煽り関数 ★★★
+        // ★★★ 煽りフェード（ここだけ miss音） ★★★
         function showTrollOverlay() {
-            sounds.miss.currentTime = 0; sounds.miss.play();
+            sounds.miss.currentTime = 0; sounds.miss.play(); // ここだけ鳴らす
 
-            // ランダムに画像を選択して表示
             const fadeNum = Math.floor(Math.random() * totalFadeImages) + 1;
             setImage(els.trollImg, 'fades', fadeNum);
 
@@ -467,11 +480,12 @@
         }
 
         function renderResult(type) {
+            // ★変更: both_guard時のmiss音削除
             if (type === 'hit_success') {
-                sounds.hit.currentTime = 0; sounds.hit.play();
+                sounds.attack.currentTime = 0; sounds.attack.play();
                 els.mainText.innerText = "HIT!!!";
                 els.playerHammerImg.classList.remove('hidden');
-                
+                // ... (スタイル設定省略:元のまま) ...
                 els.playerHammerImg.style.objectFit = "fill"; 
                 els.playerHammerImg.style.width = '2000px'; 
                 els.playerHammerImg.style.height = '300px'; 
@@ -488,11 +502,11 @@
             } 
 
             else if (type === 'guard_success') {
-                sounds.guard.currentTime = 0; sounds.guard.play();
+                sounds.defense.currentTime = 0; sounds.defense.play();
                 els.mainText.innerText = "SAFE!!!";
                 els.playerHelmetImg.classList.remove('hidden');
                 els.cpuHammerImg.classList.remove('hidden');
-                
+                // ...
                 els.cpuHammerImg.style.objectFit = "fill";
                 els.cpuHammerImg.style.width = '2000px';
                 els.cpuHammerImg.style.height = '300px';
@@ -506,11 +520,11 @@
             }
 
             else if (type === 'cpu_guarded') {
-                sounds.guard.currentTime = 0; sounds.guard.play();
+                sounds.defense.currentTime = 0; sounds.defense.play();
                 els.mainText.innerText = "GUARDED!";
                 els.playerHammerImg.classList.remove('hidden');
                 els.cpuHelmetImg.classList.remove('hidden');
-
+                // ...
                 els.playerHammerImg.style.objectFit = "fill"; 
                 els.playerHammerImg.style.width = '2000px'; 
                 els.playerHammerImg.style.height = '300px'; 
@@ -522,10 +536,10 @@
             }
 
             else if (type === 'player_blown_away') {
-                sounds.hit.currentTime = 0; sounds.hit.play();
+                sounds.attack.currentTime = 0; sounds.attack.play();
                 els.mainText.innerText = "OUCH!!!";
                 els.cpuHammerImg.classList.remove('hidden');
-
+                // ...
                 els.cpuHammerImg.style.objectFit = "fill";
                 els.cpuHammerImg.style.width = '2000px';
                 els.cpuHammerImg.style.height = '300px';
@@ -542,7 +556,7 @@
             }
 
             else if (type === 'both_guard') {
-                sounds.miss.currentTime = 0; sounds.miss.play();
+                // sounds.miss.currentTime = 0; sounds.miss.play(); // ★削除（無音）
                 els.mainText.innerText = "???";
                 els.playerHelmetImg.classList.remove('hidden');
                 els.cpuHelmetImg.classList.remove('hidden');
